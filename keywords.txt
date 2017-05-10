@@ -1,13 +1,13 @@
 #######################################
-# Syntax Coloring Map For WiFi101OTA
+# Syntax Coloring Map For MyFlashFromSD
 #######################################
 
 #######################################
 # Datatypes (KEYWORD1)
 #######################################
 
-WiFi101OTA	KEYWORD1
-WiFiOTA	KEYWORD1
+MyFlashFromSD	KEYWORD1
+MyFlashFromSD	KEYWORD1
 
 InternalStorage	KEYWORD1
 SDStorage	KEYWORD1

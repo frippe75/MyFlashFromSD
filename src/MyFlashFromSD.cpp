@@ -18,7 +18,7 @@
 
 #include <Arduino.h>
 
-#include "WiFi101OTA.h"
+#include "MyFlashFromSD.h"
 
 #if defined(ARDUINO_SAMD_ZERO)
   #define BOARD "arduino_zero_edbg"
@@ -67,14 +67,14 @@ static String base64Encode(const String& in)
   return out;
 }
 
-WiFiOTAClass::WiFiOTAClass() :
+MyFlashFromSDClass::MyFlashFromSDClass() :
   _storage(NULL),
   _server(65280),
   _lastMdnsResponseTime(0)
 {
 }
 
-void WiFiOTAClass::begin(const char* name, const char* password, OTAStorage& storage)
+void MyFlashFromSDClass::begin(const char* name, const char* password, OTAStorage& storage)
 {
   _name = name;
   _expectedAuthorization = "Basic " + base64Encode("arduino:" + String(password));
@@ -82,16 +82,38 @@ void WiFiOTAClass::begin(const char* name, const char* password, OTAStorage& sto
 
   _server.begin();
 
-  _mdnsSocket.beginMulti(IPAddress(224, 0, 0, 251), 5353);
+  //_mdnsSocket.beginMulti(IPAddress(224, 0, 0, 251), 5353);
 }
 
-void WiFiOTAClass::poll()
+void MyFlashFromSDClass::firmwareUpdate() {
+  int contentLength = 100;
+  while (client.connected() && read < contentLength) {
+      if (client.available()) {
+        read++;
+
+        _storage->write((char)client.read());
+      }
+    }
+
+    _storage->close();
+
+    if (read == contentLength) {
+      //sendHttpResponse(client, 200, "OK");
+
+      delay(250);
+
+      // apply the update
+      _storage->apply();
+}
+
+/*
+void MyFlashFromSDClass::poll()
 {
   pollMdns();
   pollServer();
 }
 
-void WiFiOTAClass::pollMdns()
+void MyFlashFromSDClass::pollMdns()
 {
   int packetLength = _mdnsSocket.parsePacket();
 
@@ -236,7 +258,7 @@ void WiFiOTAClass::pollMdns()
   _mdnsSocket.endPacket();
 }
 
-void WiFiOTAClass::pollServer()
+void MyFlashFromSDClass::pollServer()
 {
   WiFiClient client = _server.available();
 
@@ -322,7 +344,10 @@ void WiFiOTAClass::pollServer()
   }
 }
 
-void WiFiOTAClass::sendHttpResponse(Client& client, int code, const char* status)
+*/
+
+/*
+void MyFlashFromSDClass::sendHttpResponse(Client& client, int code, const char* status)
 {
   while (client.available()) {
     client.read();
@@ -337,7 +362,7 @@ void WiFiOTAClass::sendHttpResponse(Client& client, int code, const char* status
   client.stop();
 }
 
-void WiFiOTAClass::flushRequestBody(Client& client, long contentLength)
+void MyFlashFromSDClass::flushRequestBody(Client& client, long contentLength)
 {
   long read = 0;
 
@@ -349,5 +374,5 @@ void WiFiOTAClass::flushRequestBody(Client& client, long contentLength)
     }
   }
 }
-
-WiFiOTAClass WiFiOTA;
+*/
+MyFlashFromSDClass MyFlashFromSD;
